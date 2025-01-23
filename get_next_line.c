@@ -1,34 +1,35 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aleconst <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/23 15:51:29 by aleconst          #+#    #+#             */
+/*   Updated: 2025/01/23 15:51:40 by aleconst         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <unistd.h>
 #include <stdlib.h>
 #include "get_next_line.h"
-
-#define BUFFER_SIZE 5;
 
 char	*get_next_line(int fd)
 {
 	char		buf[BUFFER_SIZE];
 	char		*line;
-	int			i;
-	int			j;
 	ssize_t		nl;
 
-	line = (char *)malloc(get_len(fd, buf) + 1);
-	if (!line)
-		return ((void *)0);
 	nl = read(fd, buf, sizeof(buf));
 	if (nl <= 0)
 		return ((void *)0);
-	j = 0;
 	while (nl > 0)
 	{
-		i = 0;
-		while (buf[i] != '\n' && buf[i] != '\0')
-		{
-			line[j++] = buf[i++];
-		}
+		line = add_buf(buf);
+		if (!line)
+			return ((void *)0);
 		nl = read(fd, buf, sizeof(buf));
 	}
-	line[10] = '\0';
 	return (line);
 }
 
@@ -40,10 +41,18 @@ int	main(void)
 	char	*line;
 
 	fd = open("test.txt", O_RDONLY | O_CREAT);
+	line = get_next_line(fd);
+	if (line)
+	{
+		printf("%s\n", line);
+	}
+
+	/*
 	while ((line = get_next_line(fd)) != NULL)
 	{
 		printf("%s\n", line);
 	}
+	*/
 	free(line);
 	close(fd);
 }

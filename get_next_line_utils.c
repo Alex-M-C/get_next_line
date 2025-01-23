@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aleconst <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/01/23 15:51:15 by aleconst          #+#    #+#             */
+/*   Updated: 2025/01/23 15:51:17 by aleconst         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -13,17 +25,35 @@ static size_t	ft_strlen(const char *str)
 	return (counter);
 }
 
+static size_t	ft_strlcat(char *dest, const char *src, size_t size)
+{
+	size_t	counter;
+	size_t	dest_end;
+
+	counter = 0;
+	dest_end = ft_strlen(dest);
+	if (size <= dest_end)
+	{
+		return (size + ft_strlen(src));
+	}
+	while (src[counter] != '\n' && src[counter] != '\0'
+		&& (dest_end + counter) < size - 1)
+	{
+		dest[dest_end + counter] = src[counter];
+		counter++;
+	}
+	dest[dest_end + counter] = '\0';
+	return (dest_end + ft_strlen(src));
+}
+
 char	*add_buf(char *buf)
 {
-	static char	*cpy_line;
+	static char	*cpy_line = NULL;
 	char		*temp;
 	int			i;
-	int			j;
 
 	i = 0;
-	j = -1;
-
-	temp = "\0";
+	temp = NULL;
 	if (cpy_line)
 	{
 		temp = cpy_line;
@@ -32,15 +62,13 @@ char	*add_buf(char *buf)
 	cpy_line = (char *)malloc((i + ft_strlen(buf) + 1) * sizeof(char));
 	if (!cpy_line)
 		return ((void *)0);
-	while (temp[++j] != '\0')
-		cpy_line[j] = temp[j];
-	j = 0;
-	while (buf[j] != '\n' && buf[j] != '\0')
-		cpy_line[i++] = buf[j++];
-	cpy_line[i] = '\0';
+	if (temp)
+		ft_strlcat(cpy_line, temp, ft_strlen(temp));
+	if (buf)
+		ft_strlcat(cpy_line, buf, ft_strlen(buf));
 	return (cpy_line);
 }
-
+/*
 #include <stdio.h>
 int	main(void)
 {
@@ -60,13 +88,10 @@ int	main(void)
 	buf[4] = '0';
 	line = add_buf(buf);
 	if (line)
-	{
 		printf("%s\n", line);
-	}
 	else
-	{
 		printf("%s\n", "null");
-	}
 	free(line);
 	return (0);
 }
+*/
