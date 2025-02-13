@@ -10,10 +10,30 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
 #include <stdlib.h>
 
-static size_t	ft_strlen(const char *str)
+/*
+@returns A pointer to the first occurrence of the character C in the string S
+or NULL if any occurrence is found.
+*/
+char	*ft_strchr(const char *s, int c)
+{
+	while (*s != '\0')
+	{
+		if (*s == (unsigned char)c)
+			return ((char *)s);
+		s++;
+	}
+	if (*s == (unsigned char)c)
+		return ((char *)s);
+	return ((void *)0);
+}
+
+/*
+Calculates the length of the string pointed to by STR, 
+excluding the terminating NULL byte ('\0').
+*/
+size_t	ft_strlen(const char *str)
 {
 	int	counter;
 
@@ -25,73 +45,86 @@ static size_t	ft_strlen(const char *str)
 	return (counter);
 }
 
-static size_t	ft_strlcat(char *dest, const char *src, size_t size)
-{
-	size_t	counter;
-	size_t	dest_end;
-
-	counter = 0;
-	dest_end = ft_strlen(dest);
-	if (size <= dest_end)
-	{
-		return (size + ft_strlen(src));
-	}
-	while (src[counter] != '\n' && src[counter] != '\0'
-		&& (dest_end + counter) < size - 1)
-	{
-		dest[dest_end + counter] = src[counter];
-		counter++;
-	}
-	dest[dest_end + counter] = '\0';
-	return (dest_end + ft_strlen(src));
-}
-
-char	*add_buf(char *buf)
-{
-	static char	*cpy_line = NULL;
-	char		*temp;
-	int			i;
-
-	i = 0;
-	temp = NULL;
-	if (cpy_line)
-	{
-		temp = cpy_line;
-		i += ft_strlen(cpy_line);
-	}
-	cpy_line = (char *)malloc((i + ft_strlen(buf) + 1) * sizeof(char));
-	if (!cpy_line)
-		return ((void *)0);
-	if (temp)
-		ft_strlcat(cpy_line, temp, ft_strlen(temp));
-	if (buf)
-		ft_strlcat(cpy_line, buf, ft_strlen(buf));
-	return (cpy_line);
-}
 /*
-#include <stdio.h>
-int	main(void)
-{
-	char	*line;
-	char	buf[5];
-
-	buf[0] = '1';
-	buf[1] = '2';
-	buf[2] = '3';
-	buf[3] = '4';
-	buf[4] = '5';
-	line = add_buf(buf);
-	buf[0] = '6';
-	buf[1] = '7';
-	buf[2] = '8';
-	buf[3] = '9';
-	buf[4] = '0';
-	line = add_buf(buf);
-	if (line)
-		printf("%s\n", line);
-	else
-		printf("%s\n", "null");
-	free(line);
-	return (0);
-}
+Copies N bytes from memory area SRC to memory area DEST.
+@attention The memory areas may overlap.
+@returns A pointer to DEST.
 */
+void	*ft_memmove(void *dest, const void *src, size_t n)
+{
+	size_t				count;
+	unsigned char		*dest_byte;
+	const unsigned char	*src_byte;
+
+	if (!dest && !src)
+		return ((void *)0);
+	dest_byte = (unsigned char *)dest;
+	src_byte = (const unsigned char *)src;
+	count = -1;
+	if (dest_byte > src_byte)
+	{
+		while (n--)
+		{
+			dest_byte[n] = src_byte[n];
+		}
+	}
+	else
+	{
+		while (++count < n)
+		{
+			dest_byte[count] = src_byte[count];
+		}
+	}
+	return (dest_byte);
+}
+
+/*
+Creates a duplicate of S usign malloc(3) to allocate its memory.
+@attention The created string can be freed with free(3).
+@returns A pointer to the new string.
+*/
+static char	*ft_strdup(const char *s)
+{
+	int		count;
+	char	*s_dup;
+
+	count = 0;
+	s_dup = (char *)malloc((ft_strlen(s) + 1) * sizeof(char));
+	if (!s_dup)
+		return ((void *)0);
+	while (s[count] != '\0')
+	{
+		s_dup[count] = s[count];
+		count++;
+	}
+	s_dup[count] = '\0';
+	return (s_dup);
+}
+
+/*
+Allocates memory with malloc(3) for crating a substring from the
+string S starting at START and with a length of LEN + 1 including 
+the NULL byte ('\0') at the end.
+@returns The created substring or NULL if malloc(3) fails.
+*/
+char	*ft_substr(char const *s, unsigned int start, size_t len)
+{
+	char			*substr;
+	size_t			count;
+
+	if (start >= ft_strlen(s))
+		return (ft_strdup(""));
+	if (len > ft_strlen(s) - start)
+		len = ft_strlen(s) - start;
+	substr = (char *)malloc((len + 1) * sizeof(char));
+	if (!substr)
+		return ((void *)0);
+	count = 0;
+	while (count < len && s[count] != '\0')
+	{
+		substr[count] = (char)s[count + start];
+		count++;
+	}
+	substr[count] = '\0';
+	return (substr);
+}
