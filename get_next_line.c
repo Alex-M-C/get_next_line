@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aleconst <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: aleconst <aleconst@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 15:51:29 by aleconst          #+#    #+#             */
-/*   Updated: 2025/01/23 15:51:40 by aleconst         ###   ########.fr       */
+/*   Updated: 2025/02/18 16:41:57 by aleconst         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,14 +88,16 @@ static char	*process_buf(char *buf, int buf_size, int fd)
 {
 	char	*line;
 	char	*temp;
+	ssize_t	br;
 
 	line = ft_strchr(buf, '\n');
 	if (!line)
 	{
 		line = add_buf(buf);
-		if (read(fd, buf, buf_size) <= 0)
-			return (ft_memmove(buf, "\0", ft_strlen(buf) + 1), line);
-		return (process_buf(buf, buf_size, fd));
+		br = read(fd, buf, buf_size);
+		if (br <= 0)
+			return (ft_memset(buf, '\0', buf_size), line);
+		return (buf[br] = '\0', process_buf(buf, buf_size, fd));
 	}
 	else
 	{
@@ -137,19 +139,6 @@ static char	*add_buf(char *buf)
 	return (ft_strdup(cpy_line));
 }
 
-/* 	
-	nl = read(fd, buf, sizeof(buf));
-	if (nl <= 0)
-		return ((void *)0);
-	while (nl > 0)
-	{
-		line = add_buf(buf);
-		if (!line)
-			return ((void *)0);
-		nl = read(fd, buf, sizeof(buf));
-	} 
-*/
-// buf = [H, o, l, a, \n, \n, t, r, e, s, \n]
 char	*get_next_line(int fd)
 {
 	static char		buf[BUFFER_SIZE] = {0};
