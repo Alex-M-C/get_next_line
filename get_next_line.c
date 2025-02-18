@@ -10,79 +10,52 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#define BUFFER_SIZE 5
-
 #include <unistd.h>
 #include <stdlib.h>
 #include "get_next_line.h"
 
-static char	*ft_strdup(const char *s);
+static char	*process_buf(char *buf, int buf_size, int fd);
+static char	*add_buf(char *buf);
+static void	*ft_memset(void *s, int c, size_t n);
+static void	*ft_calloc(size_t nmemb, size_t size);
 
 /*
-@returns A pointer to the first occurrence of the character C in the string S
-or NULL if any occurrence is found.
+Fills the first N bytes of the memory area 
+pointed to by S with the constant byte C.
+@returns A pointer to the memory area S.
 */
-char	*ft_strchr(const char *s, int c)
+static void	*ft_memset(void *s, int c, size_t n)
 {
-	while (*s != '\0')
+	unsigned char	*ptr_byte;
+
+	if (n == 0)
+		return (s);
+	ptr_byte = (unsigned char *)s;
+	while (n > 0)
 	{
-		if (*s == (unsigned char)c)
-			return (ft_strdup((char *)s));
-		s++;
+		ptr_byte[n - 1] = (unsigned char)c;
+		n--;
 	}
-	if (*s == (unsigned char)c)
-		return (ft_strdup((char *)s));
-	return ((void *)0);
+	return (ptr_byte);
 }
 
 /*
-Calculates the length of the string pointed to by STR, 
-excluding the terminating NULL byte ('\0').
+Allocates memory for an array of NMEMB elements of SIZE bytes each.
+@return A pointer to the allocated memory.
 */
-size_t	ft_strlen(const char *str)
+static void	*ft_calloc(size_t nmemb, size_t size)
 {
-	int	counter;
+	size_t	total_size;
+	void	*ptr;
 
-	counter = 0;
-	while (str[counter] != '\0')
-	{
-		counter++;
-	}
-	return (counter);
-}
-
-/*
-Copies N bytes from memory area SRC to memory area DEST.
-@attention The memory areas may overlap.
-@returns A pointer to DEST.
-*/
-void	*ft_memmove(void *dest, const void *src, size_t n)
-{
-	size_t				count;
-	unsigned char		*dest_byte;
-	const unsigned char	*src_byte;
-
-	if (!dest && !src)
+	total_size = nmemb * size;
+	if (nmemb != 0 && size != 0 && total_size / size != nmemb)
 		return ((void *)0);
-	dest_byte = (unsigned char *)dest;
-	src_byte = (const unsigned char *)src;
-	count = -1;
-	if (dest_byte > src_byte)
-	{
-		while (n--)
-		{
-			dest_byte[n] = src_byte[n];
-		}
-	}
-	else
-	{
-		while (++count < n)
-		{
-			dest_byte[count] = src_byte[count];
-		}
-	}
-	return (dest_byte);
+	ptr = malloc(total_size);
+	if (!ptr)
+		return ((void *)0);
+	ft_memset(ptr, 0, total_size);
+	return (ptr);
 }
 
 /*
@@ -111,61 +84,6 @@ size_t	ft_strlcat(char *dest, const char *src, size_t size)
 	return (dest_end + ft_strlen(src));
 }
 
-/*
-Creates a duplicate of S usign malloc(3) to allocate its memory.
-@attention The created string can be freed with free(3).
-@returns A pointer to the new string.
-*/
-static char	*ft_strdup(const char *s)
-{
-	int		count;
-	char	*s_dup;
-
-	count = 0;
-	s_dup = (char *)malloc((ft_strlen(s) + 1) * sizeof(char));
-	if (!s_dup)
-		return ((void *)0);
-	while (s[count] != '\0')
-	{
-		s_dup[count] = s[count];
-		count++;
-	}
-	s_dup[count] = '\0';
-	return (s_dup);
-}
-
-/*
-Allocates memory with malloc(3) for crating a substring from the
-string S starting at START and with a length of LEN + 1 including 
-the NULL byte ('\0') at the end.
-@returns The created substring or NULL if malloc(3) fails.
-*/
-char	*ft_substr(char const *s, unsigned int start, size_t len)
-{
-	char			*substr;
-	size_t			count;
-
-	if (start >= ft_strlen(s))
-		return (ft_strdup(""));
-	if (len > ft_strlen(s) - start)
-		len = ft_strlen(s) - start;
-	substr = (char *)malloc((len + 1) * sizeof(char));
-	if (!substr)
-		return ((void *)0);
-	count = 0;
-	while (count < len && s[count] != '\0')
-	{
-		substr[count] = (char)s[count + start];
-		count++;
-	}
-	substr[count] = '\0';
-	return (substr);
-}
-
-
-static char	*process_buf(char *buf, int buf_size, int fd);
-static char	*add_buf(char *buf, int clear);
-
 static char	*process_buf(char *buf, int buf_size, int fd)
 {
 	char	*line;
@@ -174,9 +92,9 @@ static char	*process_buf(char *buf, int buf_size, int fd)
 	line = ft_strchr(buf, '\n');
 	if (!line)
 	{
-		line = add_buf(buf, 1);
+		line = add_buf(buf);
 		if (read(fd, buf, buf_size) <= 0)
-			return (NULL);
+			return (ft_memmove(buf, "\0", ft_strlen(buf) + 1), line);
 		return (process_buf(buf, buf_size, fd));
 	}
 	else
@@ -185,28 +103,28 @@ static char	*process_buf(char *buf, int buf_size, int fd)
 		if (!temp)
 			return (NULL);
 		ft_memmove(buf, line + 1, ft_strlen(line) + ft_strlen(temp));
-		line = add_buf(temp, 1);
+		line = add_buf(temp);
 		free(temp);
 	}
 	return (line);
 }
 
-static char	*add_buf(char *buf, int clear)
+static char	*add_buf(char *buf)
 {
 	static char	*cpy_line = NULL;
 	char		*temp;
 	int			i;
 
 	i = 0;
-	//temp = NULL;
-	if (clear == 0)
-		return (free(cpy_line), (void *)0);
-	if (cpy_line)
+	temp = NULL;
+	if (cpy_line && cpy_line[ft_strlen(cpy_line) - 1] == '\n')
+		free(cpy_line);
+	else if (cpy_line)
 	{
 		temp = cpy_line;
 		i += ft_strlen(cpy_line);
 	}
-	cpy_line = (char *)malloc((i + ft_strlen(buf) + 1) * sizeof(char));
+	cpy_line = (char *)ft_calloc((i + ft_strlen(buf) + 1), sizeof(char));
 	if (!cpy_line)
 		return ((void *)0);
 	if (temp)
@@ -238,7 +156,6 @@ char	*get_next_line(int fd)
 	char			*line;
 	ssize_t			nl;
 
-	printf("BUF: %s", buf);
 	if (buf[0] && ft_strlen(buf) > 0)
 	{
 		line = process_buf(buf, BUFFER_SIZE, fd);
@@ -254,7 +171,7 @@ char	*get_next_line(int fd)
 		if (!line)
 			return ((void *)0);
 	}
-	return (add_buf(buf, 0), line);
+	return (line);
 }
 
 #include <stdio.h>
@@ -274,7 +191,7 @@ int	main(void)
  */
 	while ((line = get_next_line(fd)) != NULL)
 	{
-		printf("%s\n", line);
+		printf("%s", line);
 	}
 	free(line);
 	close(fd);

@@ -21,3 +21,5 @@ char	*ft_strchr(const char *s, int c);
 void	*ft_memmove(void *dest, const void *src, size_t n);
 
 char	*ft_substr(char const *s, unsigned int start, size_t len);
+
+char	*ft_strdup(const char *s);

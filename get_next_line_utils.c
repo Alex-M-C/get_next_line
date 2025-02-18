@@ -83,7 +83,7 @@ Creates a duplicate of S usign malloc(3) to allocate its memory.
 @attention The created string can be freed with free(3).
 @returns A pointer to the new string.
 */
-static char	*ft_strdup(const char *s)
+char	*ft_strdup(const char *s)
 {
 	int		count;
 	char	*s_dup;
