@@ -6,7 +6,7 @@
 /*   By: aleconst <aleconst@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/23 15:51:29 by aleconst          #+#    #+#             */
-/*   Updated: 2025/02/18 16:41:57 by aleconst         ###   ########.fr       */
+/*   Updated: 2025/02/19 14:01:34 by aleconst         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,28 +16,7 @@
 
 static char	*process_buf(char *buf, int buf_size, int fd);
 static char	*add_buf(char *buf);
-static void	*ft_memset(void *s, int c, size_t n);
 static void	*ft_calloc(size_t nmemb, size_t size);
-
-/*
-Fills the first N bytes of the memory area 
-pointed to by S with the constant byte C.
-@returns A pointer to the memory area S.
-*/
-static void	*ft_memset(void *s, int c, size_t n)
-{
-	unsigned char	*ptr_byte;
-
-	if (n == 0)
-		return (s);
-	ptr_byte = (unsigned char *)s;
-	while (n > 0)
-	{
-		ptr_byte[n - 1] = (unsigned char)c;
-		n--;
-	}
-	return (ptr_byte);
-}
 
 /*
 Allocates memory for an array of NMEMB elements of SIZE bytes each.
@@ -54,7 +33,11 @@ static void	*ft_calloc(size_t nmemb, size_t size)
 	ptr = malloc(total_size);
 	if (!ptr)
 		return ((void *)0);
-	ft_memset(ptr, 0, total_size);
+	while (total_size > 0)
+	{
+		((unsigned char *)ptr)[total_size - 1] = 0;
+		total_size--;
+	}
 	return (ptr);
 }
 
@@ -96,18 +79,15 @@ static char	*process_buf(char *buf, int buf_size, int fd)
 		line = add_buf(buf);
 		br = read(fd, buf, buf_size);
 		if (br <= 0)
-			return (ft_memset(buf, '\0', buf_size), line);
+			return (buf[0] = '\0', line);
 		return (buf[br] = '\0', process_buf(buf, buf_size, fd));
 	}
-	else
-	{
-		temp = ft_substr(buf, 0, ft_strlen(buf) - ft_strlen(line) + 1);
-		if (!temp)
-			return (NULL);
-		ft_memmove(buf, line + 1, ft_strlen(line) + ft_strlen(temp));
-		line = add_buf(temp);
-		free(temp);
-	}
+	temp = ft_substr(buf, 0, ft_strlen(buf) - ft_strlen(line) + 1);
+	if (!temp)
+		return (NULL);
+	ft_memmove(buf, line + 1, ft_strlen(line) + ft_strlen(temp));
+	line = add_buf(temp);
+	free(temp);
 	return (line);
 }
 
@@ -145,6 +125,7 @@ char	*get_next_line(int fd)
 	char			*line;
 	ssize_t			nl;
 
+	line = (void *)0;
 	if (buf[0] && ft_strlen(buf) > 0)
 	{
 		line = process_buf(buf, BUFFER_SIZE, fd);
@@ -170,7 +151,7 @@ int	main(void)
 	int		fd;
 	char	*line;
 
-	fd = open("test.txt", O_RDONLY | O_CREAT);
+	fd = open("test2.txt", O_RDONLY | O_CREAT, 777);
 /* 	line = get_next_line(fd);
 
 	if (line)
@@ -181,7 +162,8 @@ int	main(void)
 	while ((line = get_next_line(fd)) != NULL)
 	{
 		printf("%s", line);
+		free(line);
 	}
-	free(line);
+	//free(line);
 	close(fd);
 }
