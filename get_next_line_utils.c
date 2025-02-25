@@ -1,16 +1,22 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: aleconst <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/23 15:51:15 by aleconst          #+#    #+#             */
-/*   Updated: 2025/01/23 15:51:17 by aleconst         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
+#include <stddef.h>
 #include <stdlib.h>
+#include "get_next_line.h"
+
+/*
+Calculates the length of the string pointed to by STR, 
+excluding the terminating NULL byte ('\0').
+*/
+size_t	ft_strlen(const char *str)
+{
+	int	counter;
+
+	counter = 0;
+	while (str && str[counter] != '\0')
+	{
+		counter++;
+	}
+	return (counter);
+}
 
 /*
 @returns A pointer to the first occurrence of the character C in the string S
@@ -30,75 +36,61 @@ char	*ft_strchr(const char *s, int c)
 }
 
 /*
-Calculates the length of the string pointed to by STR, 
-excluding the terminating NULL byte ('\0').
+Allocates memory with malloc(3) for creating a string
+resulting in the concatenation of S1 and S2, ensuring 
+that the new string will be NULL-terminated ('\0').
+@returns The created string or NULL if malloc(3) fails.
 */
-size_t	ft_strlen(const char *str)
+char	*ft_strjoin(char const *s1, char const *s2)
 {
-	int	counter;
-
-	counter = 0;
-	while (str[counter] != '\0')
-	{
-		counter++;
-	}
-	return (counter);
-}
-
-/*
-Copies N bytes from memory area SRC to memory area DEST.
-@attention The memory areas may overlap.
-@returns A pointer to DEST.
-*/
-void	*ft_memmove(void *dest, const void *src, size_t n)
-{
-	size_t				count;
-	unsigned char		*dest_byte;
-	const unsigned char	*src_byte;
-
-	if (!dest && !src)
-		return ((void *)0);
-	dest_byte = (unsigned char *)dest;
-	src_byte = (const unsigned char *)src;
-	count = -1;
-	if (dest_byte > src_byte)
-	{
-		while (n--)
-		{
-			dest_byte[n] = src_byte[n];
-		}
-	}
-	else
-	{
-		while (++count < n)
-		{
-			dest_byte[count] = src_byte[count];
-		}
-	}
-	return (dest_byte);
-}
-
-/*
-Creates a duplicate of S usign malloc(3) to allocate its memory.
-@attention The created string can be freed with free(3).
-@returns A pointer to the new string.
-*/
-char	*ft_strdup(const char *s)
-{
+	char	*newstr;
 	int		count;
-	char	*s_dup;
+	int		s1_len;
 
-	count = 0;
-	s_dup = (char *)malloc((ft_strlen(s) + 1) * sizeof(char));
-	if (!s_dup)
+	s1_len = ft_strlen(s1);
+	newstr = (char *)malloc((s1_len + ft_strlen(s2) + 1) * sizeof(char));
+	if (!newstr)
 		return ((void *)0);
-	while (s[count] != '\0')
+	count = 0;
+	while (count < s1_len)
 	{
-		s_dup[count] = s[count];
+		newstr[count] = (char)s1[count];
 		count++;
 	}
-	s_dup[count] = '\0';
-	return (s_dup);
+	count = 0;
+	while (s2[count] != '\0')
+	{
+		newstr[count + s1_len] = (char)s2[count];
+		count++;
+	}
+	newstr[count + s1_len] = '\0';
+	return (newstr);
+}
+
+/*
+Copies the string pointed to by SRC, including the terminating 
+NULL byte ('\0'), to DEST. The copy is truncated if DEST length is
+lower than SRC length, this can be checked by seeing the return value. 
+@attention The strings may not overlap.
+@returns The length of SRC
+*/
+size_t	ft_strlcpy(char *dest, const char *src, size_t size)
+{
+	size_t	count;
+
+	if (!dest || !src)
+		return (ft_strlen(src));
+	count = 0;
+	if (size > 0)
+	{
+		while (count < size - 1 && src[count] != '\0')
+		{
+			dest[count] = src[count];
+			count++;
+		}
+		dest[count] = '\0';
+	}
+	return (ft_strlen(src));
 }
 
 /*
