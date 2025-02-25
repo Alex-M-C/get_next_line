@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aleconst <aleconst@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/25 12:35:54 by aleconst          #+#    #+#             */
+/*   Updated: 2025/02/25 13:24:49 by aleconst         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <stddef.h>
 #include <stdlib.h>
 #include "get_next_line.h"
@@ -11,7 +23,7 @@ size_t	ft_strlen(const char *str)
 	int	counter;
 
 	counter = 0;
-	while (str && str[counter] != '\0')
+	while (str[counter] != '\0')
 	{
 		counter++;
 	}

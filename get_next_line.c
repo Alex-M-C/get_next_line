@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aleconst <aleconst@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/25 12:35:22 by aleconst          #+#    #+#             */
+/*   Updated: 2025/02/25 17:08:52 by aleconst         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -43,25 +54,26 @@ static int	process_line(char *buf, char **line)
 	char	*buf_keep;
 	int		i;
 
+	i = 0;
 	line_end = ft_strchr(buf, '\n');
 	if (!line_end)
 	{
 		add_to_line(line, buf);
 		if (!*line)
 			return (3);
-		i = 0;
 		while (i < BUFFER_SIZE)
 			buf[i++] = '\0';
 		return (0);
 	}
-	buf_keep = ft_strdup(line_end);
-	ft_strlcpy(buf_keep, line_end + 1, ft_strlen(line_end + 1) + 1);
+	buf_keep = ft_strdup(line_end + 1);
 	line_end = ft_substr(buf, 0, ft_strlen(buf) - ft_strlen(line_end) + 1);
 	add_to_line(line, line_end);
 	if (!line_end || !buf_keep || !*line)
-		return (3);
+		return (free(line_end), free(buf_keep), 3);
+	while (i < BUFFER_SIZE)
+		buf[i++] = '\0';
 	ft_strlcpy(buf, buf_keep, BUFFER_SIZE);
-	return (buf[BUFFER_SIZE - 1] = '\0', free(line_end), free(buf_keep), 1);
+	return (free(line_end), free(buf_keep), 1);
 }
 
 char	*get_next_line(int fd)
@@ -72,16 +84,16 @@ char	*get_next_line(int fd)
 	int			line_ready;
 
 	line = ft_strdup("");
+	if (!line)
+		return (NULL);
 	nl = 1;
 	line_ready = 0;
 	while (line_ready == 0)
 	{
 		if (buf[0] == '\0')
 			nl = read(fd, buf, BUFFER_SIZE);
-		if (nl <= 0 && ft_strlen(line) == 0)
+		if (nl <= 0)
 			return (free(line), NULL);
-		else if (nl <= 0 && line)
-			return (line);
 		line_ready = process_line(buf, &line);
 		if (line_ready == 3)
 			return (free(line), NULL);
@@ -91,8 +103,9 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
-#include <stdio.h>
+/* #include <stdio.h>
 #include <fcntl.h>
+
 int	main(void)
 {
 	int		fd;
@@ -105,4 +118,5 @@ int	main(void)
 		free(line);
 	}
 	close(fd);
-}
+	return (0);
+} */
