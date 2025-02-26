@@ -1,13 +1,6 @@
 
 #include <stddef.h>
 
-typedef struct s_file
-{
-	int				fd;
-	char			buf[BUFFER_SIZE];
-	struct s_file	*next;
-}	t_file;
-
 char	*get_next_line(int fd);
 
 size_t	ft_strlen(const char *str);

@@ -6,7 +6,7 @@
 /*   By: aleconst <aleconst@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 12:35:22 by aleconst          #+#    #+#             */
-/*   Updated: 2025/02/25 17:08:52 by aleconst         ###   ########.fr       */
+/*   Updated: 2025/02/26 17:26:37 by aleconst         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,8 +92,10 @@ char	*get_next_line(int fd)
 	{
 		if (buf[0] == '\0')
 			nl = read(fd, buf, BUFFER_SIZE);
-		if (nl <= 0)
+		if (nl <= 0 && ft_strlen(line) == 0)
 			return (free(line), NULL);
+		else if (nl <= 0)
+			return (line);
 		line_ready = process_line(buf, &line);
 		if (line_ready == 3)
 			return (free(line), NULL);
@@ -111,7 +113,7 @@ int	main(void)
 	int		fd;
 	char	*line;
 
-	fd = open("quijote_test.txt", O_RDONLY | O_CREAT, 777);
+	fd = open("quijote.txt", O_RDONLY | O_CREAT, 777);
 	while ((line = get_next_line(fd)) != NULL)
 	{
 		printf("%s", line);
