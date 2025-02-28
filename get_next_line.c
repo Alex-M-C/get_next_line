@@ -37,10 +37,18 @@ char	*ft_strdup(const char *s)
 	return (s_dup);
 }
 
-static void	add_to_line(char **line, char *to_add)
+static void	add_line_or_free_buf(char **line, char *to_add, int mode)
 {
 	char	*temp;
+	size_t	i;
 
+	if (mode == 1)
+	{
+		i = 0;
+		while (i < BUFFER_SIZE)
+			to_add[i++] = '\0';
+		return ;
+	}
 	if (!to_add)
 		return ;
 	temp = ft_strjoin(*line, to_add);
@@ -52,26 +60,22 @@ static int	process_line(char *buf, char **line)
 {
 	char	*line_end;
 	char	*buf_keep;
-	int		i;
 
-	i = 0;
 	line_end = ft_strchr(buf, '\n');
 	if (!line_end)
 	{
-		add_to_line(line, buf);
+		add_line_or_free_buf(line, buf, 0);
 		if (!*line)
 			return (3);
-		while (i < BUFFER_SIZE)
-			buf[i++] = '\0';
+		add_line_or_free_buf(NULL, buf, 1);
 		return (0);
 	}
 	buf_keep = ft_strdup(line_end + 1);
 	line_end = ft_substr(buf, 0, ft_strlen(buf) - ft_strlen(line_end) + 1);
-	add_to_line(line, line_end);
+	add_line_or_free_buf(line, line_end, 0);
+	add_line_or_free_buf(NULL, buf, 1);
 	if (!line_end || !buf_keep || !*line)
 		return (free(line_end), free(buf_keep), 3);
-	while (i < BUFFER_SIZE)
-		buf[i++] = '\0';
 	ft_strlcpy(buf, buf_keep, BUFFER_SIZE);
 	return (free(line_end), free(buf_keep), 1);
 }
@@ -92,8 +96,8 @@ char	*get_next_line(int fd)
 	{
 		if (buf[0] == '\0')
 			nl = read(fd, buf, BUFFER_SIZE);
-		if (nl <= 0 && ft_strlen(line) == 0)
-			return (free(line), NULL);
+		if (nl == -1 || (nl <= 0 && ft_strlen(line) == 0))
+			return (free(line), add_line_or_free_buf(NULL, buf, 1), NULL);
 		else if (nl <= 0)
 			return (line);
 		line_ready = process_line(buf, &line);
