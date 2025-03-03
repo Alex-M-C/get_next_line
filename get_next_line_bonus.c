@@ -1,17 +1,15 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aleconst <aleconst@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 12:35:22 by aleconst          #+#    #+#             */
-/*   Updated: 2025/02/26 17:26:37 by aleconst         ###   ########.fr       */
+/*   Updated: 2025/03/03 16:14:22 by aleconst         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
-#include <stdlib.h>
 #include "get_next_line_bonus.h"
 
 /*
@@ -78,7 +76,7 @@ static int	process_line(char *buf, char **line)
 
 static int	initialize_fd_buf(int fd, char **fd_buf, char **line)
 {
-	if (fd < 0 || fd >= 1024 || BUFFER_SIZE <= 0)
+	if (fd < 0 || fd >= 1024 || BUFFER_SIZE == 0)
 		return (*line = NULL, 3);
 	if (!fd_buf[fd])
 	{

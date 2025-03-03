@@ -6,12 +6,10 @@
 /*   By: aleconst <aleconst@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 12:35:22 by aleconst          #+#    #+#             */
-/*   Updated: 2025/02/26 17:26:37 by aleconst         ###   ########.fr       */
+/*   Updated: 2025/03/03 16:12:28 by aleconst         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
-#include <stdlib.h>
 #include "get_next_line.h"
 
 /*
@@ -92,9 +90,9 @@ char	*get_next_line(int fd)
 	{
 		if (buf[0] == '\0')
 			nl = read(fd, buf, BUFFER_SIZE);
-		if (nl == -1 || (nl <= 0 && ft_strlen(line) == 0))
+		if (nl == -1 || (nl == 0 && ft_strlen(line) == 0))
 			return (free(line), NULL);
-		else if (nl <= 0)
+		else if (nl == 0)
 			return (line);
 		line_ready = process_line(buf, &line);
 		if (line_ready == 3)
@@ -113,7 +111,7 @@ int	main(void)
 	int		fd;
 	char	*line;
 
-	fd = open("quijote.txt", O_RDONLY | O_CREAT, 777);
+	fd = open("sdla.txt", O_RDONLY | O_CREAT, 777);
 	while ((line = get_next_line(fd)) != NULL)
 	{
 		printf("%s", line);

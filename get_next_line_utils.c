@@ -6,12 +6,10 @@
 /*   By: aleconst <aleconst@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 12:35:54 by aleconst          #+#    #+#             */
-/*   Updated: 2025/02/25 13:24:49 by aleconst         ###   ########.fr       */
+/*   Updated: 2025/03/03 13:08:04 by aleconst         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stddef.h>
-#include <stdlib.h>
 #include "get_next_line.h"
 
 /*
