@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aleconst <aleconst@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/25 12:35:54 by aleconst          #+#    #+#             */
+/*   Updated: 2025/02/25 13:24:49 by aleconst         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <stddef.h>
 #include <stdlib.h>
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 /*
 Calculates the length of the string pointed to by STR, 
@@ -11,7 +23,7 @@ size_t	ft_strlen(const char *str)
 	int	counter;
 
 	counter = 0;
-	while (str && str[counter] != '\0')
+	while (str[counter] != '\0')
 	{
 		counter++;
 	}
@@ -93,7 +105,7 @@ size_t	ft_strlcpy(char *dest, const char *src, size_t size)
 	return (ft_strlen(src));
 }
 
-/* 
+/*
 Allocates memory with malloc(3) for crating a substring from the
 string S starting at START and with a length of LEN + 1 including 
 the NULL byte ('\0') at the end.
