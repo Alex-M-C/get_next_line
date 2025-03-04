@@ -14,10 +14,11 @@
 # define GET_NEXT_LINE_H
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 10
+#  define BUFFER_SIZE 42
 # endif
 
 # if BUFFER_SIZE > __INT32_MAX__
+#  undef BUFFER_SIZE
 #  define BUFFER_SIZE 42
 # endif
 
